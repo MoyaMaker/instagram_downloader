@@ -30,6 +30,11 @@ dependencies:
   # Load video from url
   video_player:
 
+  # Download images
+  image_downloader: ^0.19.2
+  # Toast
+  fluttertoast: ^4.0.1
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

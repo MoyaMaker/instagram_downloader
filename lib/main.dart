@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:image_downloader/image_downloader.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 // Controllers
 import 'package:instagram_downloader/instagram_controller.dart';
@@ -58,7 +60,7 @@ class _HomePageState extends State<HomePage> {
         children: <Widget>[
           _link(),
           _buttons(),
-          _futureBuild()
+          _loadContent()
         ],
       ),
     );
@@ -104,26 +106,37 @@ class _HomePageState extends State<HomePage> {
     setState(() {});
   }
 
-  Widget _photo(String urlImage) {
+  Widget _photo(String ownerName, PostContent content) {
     return Container(
-      child: FadeInImage(
-        placeholder: AssetImage('assets/loader.gif'),
-        image: NetworkImage(urlImage)
+      child: Column(
+        children: <Widget>[
+          FadeInImage(
+            placeholder: AssetImage('assets/loader.gif'),
+            image: NetworkImage(content.urlContent)
+          ),
+          RaisedButton(
+            child: Text('Download'),
+            onPressed: () async => this._download(ownerName, content)
+          )
+        ],
       )
     );
   }
 
-  Widget _video(String urlVideo) {
-    return VideoWidget(urlContent: urlVideo);
+  Widget _video(String ownerName, PostContent content) {
+    return VideoWidget(
+      urlContent: content.urlContent,
+      downloadFunction: () async => await _download(ownerName, content),
+    );
   }
 
   Widget _loadPosts(PostData postData) {
     List<Widget> _posts = [];
     postData.contentList.forEach((PostContent content) {
       if (content.isVideo)
-        _posts.add(_video(content.urlContent));
+        _posts.add(_video(postData.ownerName, content));
       else
-        _posts.add(_photo(content.urlContent));
+        _posts.add(_photo(postData.ownerName, content));
     });
 
     return Column(
@@ -131,7 +144,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _futureBuild() {
+  Widget _loadContent() {
     if (!showPost) return Container();
     return FutureBuilder(
       future: InstagramController().getDataPost(this.link),
@@ -139,15 +152,48 @@ class _HomePageState extends State<HomePage> {
         switch(snapshot.connectionState) {
           case ConnectionState.waiting:
           case ConnectionState.active:
-            return Text('Cargando');
+            return Text('Loading...');
           case ConnectionState.done:
             return _loadPosts(snapshot.data);
           case ConnectionState.none:
-            return Text('Falló');
+            return Text('Fail');
           default:
-            return Text('Espera...');
+            return Text('._.');
         }
       },
+    );
+  }
+
+  Future<void> _download(String ownerName, PostContent content) async {
+    try {
+      _showToast("Start download");
+      // Saved with this method.
+      String imageId = await ImageDownloader.downloadImage(
+        content.urlContent,
+        destination: AndroidDestinationType.directoryDCIM..subDirectory("instagram_downloader/${ownerName}_${content.idContent}.${ content.isVideo ? "mp4" : "jpg" }")
+      )
+      .catchError((error) {
+        print(error);
+      })
+      .timeout(Duration(seconds: 10), onTimeout: () {
+        _showToast("Timeout error");
+        return;
+      });
+      if (imageId == null) {
+        _showToast("Download fail :(");
+        return;
+      }
+      _showToast("Download complete");
+    } on PlatformException catch (error) {
+      print(error);
+    }
+  }
+
+  void _showToast(String message) {
+    Fluttertoast.showToast(
+      msg: message,
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.BOTTOM
     );
   }
 }

@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 
 class VideoWidget extends StatefulWidget {
-  final String urlContent;
+  @required final String urlContent;
+  @required final Function downloadFunction;
 
-  VideoWidget({Key key, this.urlContent}) : super(key: key);
+  VideoWidget({Key key, this.urlContent, this.downloadFunction}) : super(key: key);
 
   @override
   _VideoWidgetState createState() => _VideoWidgetState();
@@ -51,14 +52,22 @@ class _VideoWidgetState extends State<VideoWidget> {
                 // Use the VideoPlayer widget to display the video.
                 child:  VideoPlayer(_controller)
               ),
-              RaisedButton(
-                child: Icon(_controller.value.isPlaying ? Icons.pause : Icons.play_arrow),
-                onPressed: () {
-                  if (_controller.value.isPlaying) _controller.pause();
-                  else _controller.play();
-                  setState(() {});
-                },
-              )
+              Row(
+                children: <Widget>[
+                  RaisedButton(
+                    child: Icon(_controller.value.isPlaying ? Icons.pause : Icons.play_arrow),
+                    onPressed: () {
+                      if (_controller.value.isPlaying) _controller.pause();
+                      else _controller.play();
+                      setState(() {});
+                    },
+                  ),
+                  RaisedButton(
+                    child: Text('Download'),
+                    onPressed: widget.downloadFunction
+                  )
+                ]
+              ),
             ],
           );
         } else {
