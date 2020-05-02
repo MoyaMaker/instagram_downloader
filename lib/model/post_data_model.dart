@@ -11,9 +11,11 @@ class PostData {
 class PostContent {
   final String idContent;
   final String urlContent;
+  final bool isVideo;
 
   PostContent({
     this.idContent,
-    this.urlContent
+    this.urlContent,
+    this.isVideo
   });
 }

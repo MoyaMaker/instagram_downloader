@@ -1,9 +1,12 @@
 import 'dart:convert';
-
-import 'package:instagram_downloader/instagram_post_model.dart';
-import 'package:instagram_downloader/instagram_provider.dart';
 import 'package:http/http.dart' as http;
-import 'package:instagram_downloader/post_data_model.dart';
+
+// Providers
+import 'package:instagram_downloader/instagram_provider.dart';
+
+// Models
+import 'package:instagram_downloader/model/instagram_post_model.dart';
+import 'package:instagram_downloader/model/post_data_model.dart';
 
 class InstagramController {
 
@@ -73,6 +76,7 @@ class InstagramController {
     return PostContent(
       idContent: idContent,
       urlContent: urlContent,
+      isVideo: media.is_video
     );
   }
 }

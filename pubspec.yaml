@@ -24,7 +24,11 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^0.1.2
 
+  # Http package
   http:
+
+  # Load video from url
+  video_player:
 
 dev_dependencies:
   flutter_test:

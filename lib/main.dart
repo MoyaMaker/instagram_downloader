@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+
+// Controllers
 import 'package:instagram_downloader/instagram_controller.dart';
-import 'package:instagram_downloader/post_data_model.dart';
+
+// Models
+import 'package:instagram_downloader/model/post_data_model.dart';
+import 'package:instagram_downloader/widgets/video_widget.dart';
 
 void main() => runApp(MyApp());
 
@@ -108,10 +113,17 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  Widget _video(String urlVideo) {
+    return VideoWidget(urlContent: urlVideo);
+  }
+
   Widget _loadPosts(PostData postData) {
     List<Widget> _posts = [];
     postData.contentList.forEach((PostContent content) {
-      _posts.add(_photo(content.urlContent));
+      if (content.isVideo)
+        _posts.add(_video(content.urlContent));
+      else
+        _posts.add(_photo(content.urlContent));
     });
 
     return Column(
